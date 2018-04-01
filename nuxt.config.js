@@ -11,7 +11,8 @@ module.exports = {
       { hid: 'description', name: 'description', content: 'App created for BringIT event - Garmin Cluj' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet', href:'https://fonts.googleapis.com/icon?family=Material+Icons' }
     ]
   },
   plugins: ['~plugins/vuetify.js'],
