@@ -1,6 +1,6 @@
 module.exports = (app, db) => {
     app.post('/submit', (req, res) => {
-        if (req.body && req.body.pin === "abc") {
+        if (req.body && req.body.pin === "NoPlaceLikeHome") {
             db.collection('winners').find({'team': req.body.team}).toArray((err, items) => {
                 if (err) {
                     res.status(500);
