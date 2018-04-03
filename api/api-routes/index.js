@@ -1,6 +1,6 @@
 module.exports = (app, db) => {
     app.post('/submit', (req, res) => {
-        if (req.body && req.body.pin === "NoPlaceLikeHome") {
+        if (req.body && req.body.pin === "abc") {
             db.collection('winners').find({'team': req.body.team}).toArray((err, items) => {
                 if (err) {
                     res.status(500);
@@ -33,14 +33,21 @@ module.exports = (app, db) => {
                 }
             });
         } else {
+            db.collection('trials').insert({
+                team: req.body.team,
+                timestamp: new Date().getTime(),
+                pin: req.body.pin,
+            });
             res.json({ success: false });
         }
     });
 
     app.get('/leaderboard', (req, res) => {
-        db.collection('winners').find().toArray((err, items) => {
+        db.collection('winners').find().sort({ timestamp: 1 }).toArray((err, items) => {
             res.json({
-                items,
+                items: items.map((w, index) => {
+                    return Object.assign(w, { index: index + 1 });
+                }),
             });
         })
     })

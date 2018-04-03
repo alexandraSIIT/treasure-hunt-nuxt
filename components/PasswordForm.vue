@@ -1,5 +1,5 @@
 <template>
-  <v-form id="pin-form" v-bind:class="{'has-error': !valid}">
+  <v-form id="pin-form" v-bind:class="{'has-error': !serverValidation}" v-model="valid" lazy-validatio>
     <v-select
       label="Select your team color"
       :items="teams"
@@ -11,24 +11,28 @@
       label="PIN"
       v-model="providedPassword"
       @keyup="onPinChanged"
+      :rules="[v => !!v || 'Please enter PIN']"
       :counter="15"
       required
     ></v-text-field>
-    <section v-show="!valid" class="error-message">Incorrect PIN</section>
+    <section v-show="!serverValidation" class="error-message">Incorrect PIN</section>
     <v-btn
       @click="submit"
-      :disabled="disableForm"
+      :disabled="!valid || gameOver"
     >
       submit
     </v-btn>
     <div>
-      <v-alert type="success" :value="disableForm">
+      <v-alert type="success" :value="gameOver">
         Congrats! You made it!
       </v-alert>
       <v-alert type="error" :value="error">
         {{error}}
       </v-alert>
-      <label v-if="trials >= 3">
+      <label v-if="trials > 3 && trials < 10">
+        Hint: "_ o _ _ _ _ _ L_ _ _ _ o _ e"
+      </label>
+      <label v-if="trials >= 10">
         Hint: "There is no place like 127.0.0.1"
       </label>
     </div>
@@ -41,27 +45,30 @@ import teamConfig from '../config/teams';
 export default {
   methods: {
     submit() {
-      axios
-        .post("/api/submit", {
-          pin: this.providedPassword,
-          team: this.selectedTeam
-        })
-        .then(resp => {
-          this.valid = resp.data.success;
-          !resp.data.success ? this.trials++ : (this.trials = 0);
-          if (resp.data.success) {
-            this.$store.dispatch('addWinner', {
-              team: this.selectedTeam,
-            });
-            this.disableForm = true;
-          }
-        })
-        .catch((err) => {
-          this.error = err.response.data.error;
-        })
+        axios
+          .post("/api/submit", {
+            pin: this.providedPassword,
+            team: this.selectedTeam
+          })
+          .then(resp => {
+            this.serverValidation = resp.data.success;
+            !resp.data.success ? this.trials++ : (this.trials = 0);
+            if (resp.data.success) {
+              this.$store.dispatch('addWinner', {
+                team: this.selectedTeam,
+              });
+              this.gameOver = true;
+            }
+          })
+          .catch((err) => {
+            this.error = err.response.data.error;
+          })
     },
-    onPinChanged() {
-      this.valid = true;
+    onPinChanged(ev) {
+      if (this.selectedTeam && ev.target.value) {
+        this.valid = true;
+        this.serverValidation = true;
+      }
     }
   },
   computed: {
@@ -76,18 +83,11 @@ export default {
   },
   data: () => ({
     providedPassword: "",
-    disableForm: false,
+    gameOver: false,
+    serverValidation: true,
     error: '',
     valid: true,
     trials: 0,
-    // teams: [
-    //   { text: "Red", value: "team-1" },
-    //   { text: "Yellow", value: "team-2" },
-    //   { text: "Green", value: "team-3" },
-    //   { text: "Blue", value: "team-4" },
-    //   { text: "Pink", value: "team-5" },
-    //   { text: "Orange", value: "team-6" }
-    // ],
     selectedTeam: null
   })
 };

@@ -1,10 +1,10 @@
 const teams = {
-    'team-1': 'Red',
-    'team-2': 'Yellow',
-    'team-3': 'Blue',
-    'team-4': 'Pink',
-    'team-5': 'Orange',
-    'team-6': 'Green'
+    'team-1': 'Portocaliu',
+    'team-2': 'Bej',
+    'team-3': 'Lila',
+    'team-4': 'Verde',
+    'team-5': 'Roz',
+    'team-6': 'Maro'
 };
 module.exports = {
     teams,
